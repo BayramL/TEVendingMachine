@@ -1,5 +1,7 @@
 package com.techelevator.ui;
 
+import com.techelevator.application.VendingMachine;
+
 import java.math.BigDecimal;
 import java.util.Scanner;
 
@@ -11,6 +13,28 @@ import java.util.Scanner;
 public class UserInput
 {
     private static Scanner scanner = new Scanner(System.in);
+
+    public static String getUserMoney() {
+        System.out.println("Enter in whole dollar amounts ($1, $5, $10, $20): ");
+        String selectedOption = scanner.nextLine();
+
+        if (selectedOption.equals("1")) {
+            return selectedOption;
+        }
+        else if (selectedOption.equals("5")) {
+            return selectedOption;
+        }
+        else if (selectedOption.equals("10")) {
+            return selectedOption;
+        }
+        else if (selectedOption.equals("20")) {
+            return selectedOption;
+        }
+        else {
+            return "";
+        }
+
+    }
 
     public static String getHomeScreenOption()
     {
@@ -25,7 +49,7 @@ public class UserInput
         System.out.print("Please select an option: ");
 
         String selectedOption = scanner.nextLine();
-        String option = selectedOption.trim().toLowerCase();
+        String option = selectedOption.trim().toUpperCase();
 
         if (option.equals("D"))
         {
@@ -38,6 +62,43 @@ public class UserInput
         else if (option.equals("E"))
         {
             return "exit";
+        }
+        else
+        {
+            return "";
+        }
+
+    }
+
+    public static String getSubMenuOption(VendingMachine vendingMachine)
+    {
+        System.out.println("What would you like to do?");
+        System.out.println();
+
+        System.out.println("M) Feed Money");
+        System.out.println("P) Select Item");
+        System.out.println("F) Finish Transaction");
+        System.out.println();
+
+        System.out.println("Total money: $" + vendingMachine.getMoney());
+
+        System.out.println();
+        System.out.print("Please select an option: ");
+
+        String selectedOption = scanner.nextLine();
+        String option = selectedOption.trim().toUpperCase();
+
+        if (option.equals("M"))
+        {
+            return "money";
+        }
+        else if (option.equals("P"))
+        {
+            return "select";
+        }
+        else if (option.equals("F"))
+        {
+            return "finish";
         }
         else
         {
