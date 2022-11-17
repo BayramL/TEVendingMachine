@@ -3,11 +3,15 @@ package com.techelevator.application;
 import com.techelevator.ui.UserInput;
 import com.techelevator.ui.UserOutput;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.logging.FileHandler;
+
 
 public class VendingMachine 
 {
@@ -21,6 +25,7 @@ public class VendingMachine
 
     public void run()
     {
+        this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
         readInputFile();
 
         while(true)
@@ -84,6 +89,7 @@ public class VendingMachine
     }
 
     public void runSubMenu() {
+        int itemsPurchased = 0;
         while(true)
         {
             UserOutput.displayHomeScreen();
@@ -99,15 +105,83 @@ public class VendingMachine
                 }
                 else {
                     this.money = this.money.add(new BigDecimal(money));
+                    String auditOutput = "";
+                    String pattern = "d/M/u hh:mm:ss a";
+
+                    LocalDateTime nowTime = LocalDateTime.now();
+                    auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
+
+                    auditOutput += " MONEY FED:           ";
+
+                    auditOutput += "$" + money + ".00" + " $" + this.getMoney();
+                    UserOutput.printToAuditFile(auditOutput);
                 }
             }
             else if(choice.equals("select"))
             {
                 // select item to purchase
+                // If items purchased it odd, do the BOGODO deal.
+                itemsPurchased++;
+                // BUY ITEMS....
+                if (itemsPurchased % 2 == 1) {
+                    // NO BOGODO deal
+                }
+                else {
+                    // YES BOGODO deal
+                }
+
+                // Print to audit.txt file
+
             }
             else if(choice.equals("finish"))
             {
+                String moneyBeforeChange = this.money.toString();
+                int dollars = 0, quarters = 0, dimes = 0, nickels = 0;
                 System.out.println("* Back to Main Menu *");
+                while (this.money.compareTo(new BigDecimal("0")) > 0) {
+                    if (this.money.compareTo(new BigDecimal("1")) >= 0) {
+                        dollars++;
+                        this.money = this.money.subtract(new BigDecimal("1"));
+                    }
+                    else if (this.money.compareTo(new BigDecimal("0.25")) >= 0) {
+                        quarters++;
+                        this.money = this.money.subtract(new BigDecimal("0.25"));
+                    }
+                    else if (this.money.compareTo(new BigDecimal("0.10")) >= 0) {
+                        dimes++;
+                        this.money = this.money.subtract(new BigDecimal("0.10"));
+                    }
+                    else if (this.money.compareTo(new BigDecimal("0.05")) >= 0) {
+                        nickels++;
+                        this.money = this.money.subtract(new BigDecimal("0.05"));
+                    }
+                }
+                String change = "";
+                if (dollars > 0) {
+                    change += dollars + " Dollars";
+                }
+                else if (quarters > 0) {
+                    change += quarters + " Quarters";
+                }
+                else if (dimes > 0) {
+                    change += dimes + " Dimes";
+                }
+                else if (nickels > 0) {
+                    change += nickels + " Nickels";
+                }
+                System.out.println("Your change is: " + change);
+
+                String auditOutput = "";
+                String pattern = "d/M/u hh:mm:ss a";
+
+                LocalDateTime nowTime = LocalDateTime.now();
+                auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
+
+                auditOutput += " CHANGE GIVEN:           ";
+
+                auditOutput += "$" + moneyBeforeChange + " $" + this.getMoney();
+                UserOutput.printToAuditFile(auditOutput);
+
                 break;
             }
         }
