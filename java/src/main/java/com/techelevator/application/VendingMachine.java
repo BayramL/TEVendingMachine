@@ -7,7 +7,6 @@ import com.techelevator.ui.UserOutput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -99,23 +98,7 @@ public class VendingMachine
             {
                 // feeds money to machine
                 String money = UserInput.getUserMoney();
-                if (money.equals(""))
-                {
-                    System.out.println("Invalid money amount");
-                }
-                else {
-                    this.money = this.money.add(new BigDecimal(money));
-                    String auditOutput = "";
-                    String pattern = "d/M/u hh:mm:ss a";
-
-                    LocalDateTime nowTime = LocalDateTime.now();
-                    auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
-
-                    auditOutput += " MONEY FED:           ";
-
-                    auditOutput += "$" + money + ".00" + " $" + this.getMoney();
-                    UserOutput.printToAuditFile(auditOutput);
-                }
+                addMoney(money);
             }
             else if(choice.equals("select"))
             {
@@ -135,56 +118,82 @@ public class VendingMachine
             }
             else if(choice.equals("finish"))
             {
-                String moneyBeforeChange = this.money.toString();
-                int dollars = 0, quarters = 0, dimes = 0, nickels = 0;
-                System.out.println("* Back to Main Menu *");
-                while (this.money.compareTo(new BigDecimal("0")) > 0) {
-                    if (this.money.compareTo(new BigDecimal("1")) >= 0) {
-                        dollars++;
-                        this.money = this.money.subtract(new BigDecimal("1"));
-                    }
-                    else if (this.money.compareTo(new BigDecimal("0.25")) >= 0) {
-                        quarters++;
-                        this.money = this.money.subtract(new BigDecimal("0.25"));
-                    }
-                    else if (this.money.compareTo(new BigDecimal("0.10")) >= 0) {
-                        dimes++;
-                        this.money = this.money.subtract(new BigDecimal("0.10"));
-                    }
-                    else if (this.money.compareTo(new BigDecimal("0.05")) >= 0) {
-                        nickels++;
-                        this.money = this.money.subtract(new BigDecimal("0.05"));
-                    }
-                }
-                String change = "";
-                if (dollars > 0) {
-                    change += dollars + " Dollars";
-                }
-                else if (quarters > 0) {
-                    change += quarters + " Quarters";
-                }
-                else if (dimes > 0) {
-                    change += dimes + " Dimes";
-                }
-                else if (nickels > 0) {
-                    change += nickels + " Nickels";
-                }
-                System.out.println("Your change is: " + change);
-
-                String auditOutput = "";
-                String pattern = "d/M/u hh:mm:ss a";
-
-                LocalDateTime nowTime = LocalDateTime.now();
-                auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
-
-                auditOutput += " CHANGE GIVEN:           ";
-
-                auditOutput += "$" + moneyBeforeChange + " $" + this.getMoney();
-                UserOutput.printToAuditFile(auditOutput);
-
+                calculateChange();
                 break;
             }
         }
+    }
+
+    public void addMoney(String money) {
+        if (money.equals(""))
+        {
+            System.out.println("Invalid money amount");
+        }
+        else {
+            this.money = this.money.add(new BigDecimal(money));
+            String auditOutput = "";
+            String pattern = "d/M/u hh:mm:ss a";
+
+            LocalDateTime nowTime = LocalDateTime.now();
+            auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
+
+            //auditOutput += " MONEY FED:           ";
+            //auditOutput += "$" + money + ".00" + " $" + this.getMoney();
+
+            String formatted = String.format(" %-18s %7s.00 %7s", "MONEY FED", "$" + money, "$" + this.getMoney());
+            UserOutput.printToAuditFile(auditOutput + formatted);
+        }
+    }
+
+    public void calculateChange() {
+        String moneyBeforeChange = this.money.toString();
+        int dollars = 0, quarters = 0, dimes = 0, nickels = 0;
+        System.out.println("* Back to Main Menu *");
+        while (this.money.compareTo(new BigDecimal("0")) > 0) {
+            if (this.money.compareTo(new BigDecimal("1")) >= 0) {
+                dollars++;
+                this.money = this.money.subtract(new BigDecimal("1"));
+            }
+            else if (this.money.compareTo(new BigDecimal("0.25")) >= 0) {
+                quarters++;
+                this.money = this.money.subtract(new BigDecimal("0.25"));
+            }
+            else if (this.money.compareTo(new BigDecimal("0.10")) >= 0) {
+                dimes++;
+                this.money = this.money.subtract(new BigDecimal("0.10"));
+            }
+            else if (this.money.compareTo(new BigDecimal("0.05")) >= 0) {
+                nickels++;
+                this.money = this.money.subtract(new BigDecimal("0.05"));
+            }
+        }
+        String change = "";
+        if (dollars > 0) {
+            change += dollars + " Dollars";
+        }
+        else if (quarters > 0) {
+            change += quarters + " Quarters";
+        }
+        else if (dimes > 0) {
+            change += dimes + " Dimes";
+        }
+        else if (nickels > 0) {
+            change += nickels + " Nickels";
+        }
+        System.out.println("Your change is: " + change);
+
+        String auditOutput = "";
+        String pattern = "d/M/u hh:mm:ss a";
+
+        LocalDateTime nowTime = LocalDateTime.now();
+        auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
+
+        //auditOutput += " CHANGE GIVEN:           ";
+        String formatted = String.format(" %-21s %7s %7s", "CHANGE GIVEN:", "$" + moneyBeforeChange, "$" + this.getMoney());
+
+        //auditOutput += "$" + moneyBeforeChange + " $" + this.getMoney();
+        UserOutput.printToAuditFile(auditOutput + formatted);
+
     }
 
 
