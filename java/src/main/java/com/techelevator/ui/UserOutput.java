@@ -26,6 +26,7 @@ public class UserOutput
             System.err.println("Audit.txt file was not found.");
         }
     }
+
     public static void displayMessage(String message)
     {
         System.out.println();
