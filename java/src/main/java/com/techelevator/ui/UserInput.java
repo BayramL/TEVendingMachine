@@ -14,26 +14,16 @@ public class UserInput
 {
     private static Scanner scanner = new Scanner(System.in);
 
+    public static String getCodeFromUser() {
+        System.out.println("Enter the code for the item you wish to purchase");
+        String userChoice = scanner.nextLine();
+        return userChoice;
+    }
+
     public static String getUserMoney() {
         System.out.println("Enter in whole dollar amounts ($1, $5, $10, $20): ");
         String selectedOption = scanner.nextLine();
-
-        if (selectedOption.equals("1")) {
-            return selectedOption;
-        }
-        else if (selectedOption.equals("5")) {
-            return selectedOption;
-        }
-        else if (selectedOption.equals("10")) {
-            return selectedOption;
-        }
-        else if (selectedOption.equals("20")) {
-            return selectedOption;
-        }
-        else {
-            return "";
-        }
-
+        return selectedOption;
     }
 
     public static String getHomeScreenOption()
@@ -76,7 +66,7 @@ public class UserInput
         System.out.println();
 
         System.out.println("M) Feed Money");
-        System.out.println("P) Select Item");
+        System.out.println("S) Select Item");
         System.out.println("F) Finish Transaction");
         System.out.println();
 
@@ -92,7 +82,7 @@ public class UserInput
         {
             return "money";
         }
-        else if (option.equals("P"))
+        else if (option.equals("S"))
         {
             return "select";
         }

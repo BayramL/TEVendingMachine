@@ -25,7 +25,7 @@ public class VendingMachine
     public void run()
     {
         this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
-        readInputFile();
+        readInputFile("catering1.csv");
 
         while(true)
         {
@@ -51,8 +51,8 @@ public class VendingMachine
     }
 
     // Reads the input file to load our vending machine.
-    public void readInputFile() {
-        File file = new File("catering1.csv");
+    public void readInputFile(String fileName) {
+        File file = new File(fileName);
         try (Scanner fileReader = new Scanner(file)) {
             while (fileReader.hasNextLine()) {
                 String line = fileReader.nextLine();
@@ -103,16 +103,13 @@ public class VendingMachine
             else if(choice.equals("select"))
             {
                 // select item to purchase
-                // If items purchased it odd, do the BOGODO deal.
-                itemsPurchased++;
-                // BUY ITEMS....
-                if (itemsPurchased % 2 == 1) {
-                    // NO BOGODO deal
-                }
-                else {
-                    // YES BOGODO deal
-                }
-
+                // If items purchased is odd, do the BOGODO deal.
+                // Display all items for purchase.
+                printItems();
+                // Get the choice from the user
+                String userChoice = UserInput.getCodeFromUser();
+                // Changed this part to method for easy testing
+                itemsPurchased = getItemFromMachine(userChoice, itemsPurchased);
                 // Print to audit.txt file
 
             }
@@ -125,7 +122,7 @@ public class VendingMachine
     }
 
     public void addMoney(String money) {
-        if (money.equals(""))
+        if (!money.equals("1") && !money.equals("5") && !money.equals("10") && !money.equals("20"))
         {
             System.out.println("Invalid money amount");
         }
@@ -139,6 +136,7 @@ public class VendingMachine
 
             //auditOutput += " MONEY FED:           ";
             //auditOutput += "$" + money + ".00" + " $" + this.getMoney();
+            // This is how we did it before switching to string.format
 
             String formatted = String.format(" %-18s %7s.00 %7s", "MONEY FED", "$" + money, "$" + this.getMoney());
             UserOutput.printToAuditFile(auditOutput + formatted);
@@ -169,16 +167,16 @@ public class VendingMachine
         }
         String change = "";
         if (dollars > 0) {
-            change += dollars + " Dollars";
+            change += dollars + " Dollar(s) ";
         }
-        else if (quarters > 0) {
-            change += quarters + " Quarters";
+        if (quarters > 0) {
+            change += quarters + " Quarter(s) ";
         }
-        else if (dimes > 0) {
-            change += dimes + " Dimes";
+        if (dimes > 0) {
+            change += dimes + " Dime(s) ";
         }
-        else if (nickels > 0) {
-            change += nickels + " Nickels";
+        if (nickels > 0) {
+            change += nickels + " Nickel(s) ";
         }
         System.out.println("Your change is: " + change);
 
@@ -189,14 +187,107 @@ public class VendingMachine
         auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
 
         //auditOutput += " CHANGE GIVEN:           ";
+        //auditOutput += "$" + moneyBeforeChange + " $" + this.getMoney();
+        // This is how we did it before switching to string.format
+
         String formatted = String.format(" %-21s %7s %7s", "CHANGE GIVEN:", "$" + moneyBeforeChange, "$" + this.getMoney());
 
-        //auditOutput += "$" + moneyBeforeChange + " $" + this.getMoney();
+
         UserOutput.printToAuditFile(auditOutput + formatted);
 
     }
 
+    public int getItemFromMachine(String userChoice, int itemsPurchased) {
+        // Loop through map.
+        boolean isFound = false;
+        for (Map.Entry<Item, Integer> entry : map.entrySet()) {
+            if (userChoice.equalsIgnoreCase(entry.getKey().getItemCode())) {
+                if (entry.getValue() > 0) {
+                    if (itemsPurchased % 2 == 0) {
+                        // NO BOGODO deal
+                        BigDecimal price = entry.getKey().getPrice(); // Creating variables for more clarity
+                        if (this.money.compareTo(price) >= 0) {
+                            map.put(entry.getKey(), entry.getValue() - 1);
+                            String moneyBeforeTransaction = this.money.toString();
+                            this.money = this.money.subtract(entry.getKey().getPrice());
+                            isFound = true;
+                            itemsPurchased++;
 
+                            String auditOutput = "";
+                            String pattern = "d/M/u hh:mm:ss a";
+                            LocalDateTime nowTime = LocalDateTime.now();
+                            auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
+                            String formatted = String.format(" %-18s %s %7s %7s", entry.getKey().getName()
+                                    , entry.getKey().getItemCode(), "$" + moneyBeforeTransaction, "$" + this.money);
+                            UserOutput.printToAuditFile(auditOutput + formatted);
+
+
+                            if (entry.getKey().getType().equals("Gum")) {
+                                System.out.println("Chewy, Chewy, Lots O Bubbles!");
+                            }
+                            else if (entry.getKey().getType().equals("Drink")) {
+                                System.out.println("Drinky, Drinky, Slurp Slurp!");
+                            }
+                            else if (entry.getKey().getType().equals("Candy")) {
+                                System.out.println("Sugar, Sugar, so Sweet!");
+                            }
+                            else if (entry.getKey().getType().equals("Munchy")) {
+                                System.out.println("Munchy, Munchy, so Good!");
+                            }
+                        }
+                        else {
+                            System.out.println("YOU DON'T HAVE ENOUGH MONEY");
+                        }
+                    }
+                    else {
+                        // YES BOGODO deal
+                        BigDecimal discount = new BigDecimal("1"); // Creating variables for more clarity
+                        BigDecimal price = entry.getKey().getPrice(); // Creating variables for more clarity
+                        if (this.money.compareTo(price.subtract(discount)) >= 0) {
+                            map.put(entry.getKey(), entry.getValue() - 1);
+                            String moneyBeforeTransaction = this.money.toString();
+                            this.money = this.money.subtract(entry.getKey().getPrice().subtract(discount));
+
+                            String auditOutput = "";
+                            String pattern = "d/M/u hh:mm:ss a";
+                            LocalDateTime nowTime = LocalDateTime.now();
+                            auditOutput += (nowTime.format(DateTimeFormatter.ofPattern(pattern)));
+                            String formatted = String.format(" %-18s %s %7s %7s", entry.getKey().getName()
+                                    , entry.getKey().getItemCode(), "$" + moneyBeforeTransaction, "$" + this.money);
+                            UserOutput.printToAuditFile(auditOutput + formatted);
+
+                            isFound = true;
+                            itemsPurchased++;
+
+                            if (entry.getKey().getType().equals("Gum")) {
+                                System.out.println("Chewy, Chewy, Lots O Bubbles!");
+                            }
+                            else if (entry.getKey().getType().equals("Drink")) {
+                                System.out.println("Drinky, Drinky, Slurp Slurp!");
+                            }
+                            else if (entry.getKey().getType().equals("Candy")) {
+                                System.out.println("Sugar, Sugar, so Sweet!");
+                            }
+                            else if (entry.getKey().getType().equals("Munchy")) {
+                                System.out.println("Munchy, Munchy, so Good!");
+                            }
+                        }
+                        else {
+                            System.out.println("YOU DON'T HAVE ENOUGH MONEY");
+                        }
+                    }
+                }
+                else {
+                    System.out.println("THERE ARE NO MORE AVAILABLE");
+                }
+            }
+
+        }
+        if (!isFound) {
+            System.out.println("THE CODE WAS NOT FOUND");
+        }
+        return itemsPurchased;
+    }
 
 
 }
