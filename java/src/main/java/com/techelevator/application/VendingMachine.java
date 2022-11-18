@@ -122,6 +122,7 @@ public class VendingMachine
     }
 
     public void addMoney(String money) {
+        this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
         if (!money.equals("1") && !money.equals("5") && !money.equals("10") && !money.equals("20"))
         {
             System.out.println("Invalid money amount");
@@ -198,6 +199,7 @@ public class VendingMachine
     }
 
     public int getItemFromMachine(String userChoice, int itemsPurchased) {
+        this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
         // Loop through map.
         boolean isFound = false;
         for (Map.Entry<Item, Integer> entry : map.entrySet()) {

@@ -16,7 +16,7 @@ public class VendingMachineTest {
 
     @Test
     public void addMoney_should_add_10_to_vending_machine_for_input_10() {
-        BigDecimal expected = new BigDecimal("10");
+        BigDecimal expected = new BigDecimal("10.00");
 
         vendingMachine.addMoney("10");
         BigDecimal actual = vendingMachine.getMoney();
@@ -25,7 +25,7 @@ public class VendingMachineTest {
 
     @Test
     public void addMoney_should_add_nothing_to_vending_machine_for_input_7() {
-        BigDecimal expected = new BigDecimal("0");
+        BigDecimal expected = new BigDecimal("0.00");
 
         vendingMachine.addMoney("7");
         BigDecimal actual = vendingMachine.getMoney();
@@ -34,7 +34,7 @@ public class VendingMachineTest {
 
     @Test
     public void addMoney_should_add_nothing_to_vending_machine_for_input_Hello() {
-        BigDecimal expected = new BigDecimal("0");
+        BigDecimal expected = new BigDecimal("0.00");
 
         vendingMachine.addMoney("Hello");
         BigDecimal actual = vendingMachine.getMoney();
@@ -59,7 +59,7 @@ public class VendingMachineTest {
         vendingMachine.readInputFile("catering1.csv");
         vendingMachine.getItemFromMachine("A1", 0);
 
-        BigDecimal expected = new BigDecimal("0");
+        BigDecimal expected = new BigDecimal("0.00");
         BigDecimal actual = vendingMachine.getMoney();
 
         Assert.assertEquals(expected, actual);
@@ -72,7 +72,7 @@ public class VendingMachineTest {
         vendingMachine.addMoney("10");
         vendingMachine.getItemFromMachine("Z1", 0);
 
-        BigDecimal expected = new BigDecimal("10");
+        BigDecimal expected = new BigDecimal("10.00");
         BigDecimal actual = vendingMachine.getMoney();
 
         Assert.assertEquals(expected, actual);
@@ -130,7 +130,7 @@ public class VendingMachineTest {
         vendingMachine.addMoney("20");
         vendingMachine.calculateChange();
 
-        BigDecimal expected = new BigDecimal("0");
+        BigDecimal expected = new BigDecimal("0.00");
         BigDecimal actual = vendingMachine.getMoney();
 
         Assert.assertEquals(expected, actual);
