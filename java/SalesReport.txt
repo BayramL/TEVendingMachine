@@ -1,0 +1,20 @@
+       Taste Elevator Sales Report:
+| Item               | Full Price | Discounted |
+|--------------------|------------|------------|
+| Chippos            |     0      |     0      |
+| Teaberry           |     0      |     0      |
+| Mountain Melter    |     0      |     0      |
+| Preengles          |     0      |     0      |
+| Stackers           |     0      |     0      |
+| Caramel Bar        |     0      |     0      |
+| Popcorn            |     0      |     0      |
+| Papsi              |     1      |     1      |
+| Wonka Bar          |     0      |     0      |
+| Snykkers           |     0      |     0      |
+| Moonpie            |     0      |     0      |
+| U-Chews            |     3      |     3      |
+| 7Down              |     0      |     0      |
+| Chiclets           |     0      |     0      |
+| Ginger Ayle        |     0      |     0      |
+| Singlemint Gum     |     0      |     0      |
+Total Sales: $12.80

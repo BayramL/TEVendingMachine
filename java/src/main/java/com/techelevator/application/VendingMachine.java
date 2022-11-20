@@ -22,14 +22,17 @@ public class VendingMachine
         return this.money;
     }
 
+    // Manu menu for the vending machine with its 3 options
     public void run()
     {
+        // This makes sure all use of money has 2 decimal points no matter what
         this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
         readInputFile("catering1.csv");
 
         while(true)
         {
             UserOutput.displayHomeScreen();
+            // Grabs the user input and makes sure it is the correct input
             String choice = UserInput.getHomeScreenOption();
 
             if(choice.equals("display"))
@@ -40,11 +43,13 @@ public class VendingMachine
             else if(choice.equals("purchase"))
             {
                 // make a purchase
-                runSubMenu();
+                runSubMenu(); // Submenu with adding money or selecting item
             }
             else if(choice.equals("exit"))
             {
-                System.out.println("** TERMINATING PROGRAM **");
+                System.out.println("** CREATING SALES REPORT **");
+                UserOutput.clearSalesFile(); // Clears the sales report in order to add a new one
+                printSalesReport(); // Prints the new sales report
                 break;
             }
         }
@@ -74,8 +79,9 @@ public class VendingMachine
     public void printItems() {
         // Loops through the map and prints needed information.
         for (Map.Entry<Item,Integer> entry : map.entrySet()) {
-            System.out.print(entry.getKey().getItemCode() + ": " + entry.getKey().getName()
-                    + " costs " + entry.getKey().getPrice());
+            String finalStr = String.format("%-3s: %-18s - Costs: %s", entry.getKey().getItemCode(),
+                    entry.getKey().getName(), entry.getKey().getPrice());
+            System.out.print(finalStr);
             // If quantity is 0, print no longer available, otherwise
             // print the remaining number of items.
             if (entry.getValue() == 0) {
@@ -87,11 +93,13 @@ public class VendingMachine
         }
     }
 
+    // Runs the sub menu which has the options for adding money to the vending machine,
+    // selecting an item from the vending machine or exiting the sub menu
     public void runSubMenu() {
         int itemsPurchased = 0;
         while(true)
         {
-            UserOutput.displayHomeScreen();
+            UserOutput.displaySubMenuScreen();
             String choice = UserInput.getSubMenuOption(this);
 
             if(choice.equals("money"))
@@ -121,6 +129,8 @@ public class VendingMachine
         }
     }
 
+    // Adds money to the vending machine only if its in values of
+    // 1, 5, 10 or 20
     public void addMoney(String money) {
         this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
         if (!money.equals("1") && !money.equals("5") && !money.equals("10") && !money.equals("20"))
@@ -144,6 +154,8 @@ public class VendingMachine
         }
     }
 
+    // Calculates how much change you are given back in the lowest denominations
+    // and sets the money in the vending machine back to 0
     public void calculateChange() {
         String moneyBeforeChange = this.money.toString();
         int dollars = 0, quarters = 0, dimes = 0, nickels = 0;
@@ -198,6 +210,8 @@ public class VendingMachine
 
     }
 
+    // Method that buys an item from the vending machine
+    // Tells you if you dont have enough money or if you chose an invalid code
     public int getItemFromMachine(String userChoice, int itemsPurchased) {
         this.money = this.money.setScale(2, BigDecimal.ROUND_HALF_UP);
         // Loop through map.
@@ -212,6 +226,7 @@ public class VendingMachine
                             map.put(entry.getKey(), entry.getValue() - 1);
                             String moneyBeforeTransaction = this.money.toString();
                             this.money = this.money.subtract(entry.getKey().getPrice());
+                            entry.getKey().addToRegularPurchase();
                             isFound = true;
                             itemsPurchased++;
 
@@ -236,9 +251,12 @@ public class VendingMachine
                             else if (entry.getKey().getType().equals("Munchy")) {
                                 System.out.println("Munchy, Munchy, so Good!");
                             }
+                            break;
                         }
                         else {
                             System.out.println("YOU DON'T HAVE ENOUGH MONEY");
+                            isFound = true;
+                            break;
                         }
                     }
                     else {
@@ -249,6 +267,7 @@ public class VendingMachine
                             map.put(entry.getKey(), entry.getValue() - 1);
                             String moneyBeforeTransaction = this.money.toString();
                             this.money = this.money.subtract(entry.getKey().getPrice().subtract(discount));
+                            entry.getKey().addToDiscountedPurchase();
 
                             String auditOutput = "";
                             String pattern = "d/M/u hh:mm:ss a";
@@ -273,14 +292,19 @@ public class VendingMachine
                             else if (entry.getKey().getType().equals("Munchy")) {
                                 System.out.println("Munchy, Munchy, so Good!");
                             }
+                            break;
                         }
                         else {
                             System.out.println("YOU DON'T HAVE ENOUGH MONEY");
+                            isFound = true;
+                            break;
                         }
                     }
                 }
                 else {
                     System.out.println("THERE ARE NO MORE AVAILABLE");
+                    isFound = true;
+                    break;
                 }
             }
 
@@ -289,6 +313,25 @@ public class VendingMachine
             System.out.println("THE CODE WAS NOT FOUND");
         }
         return itemsPurchased;
+    }
+
+    // Prints a sales report of all the items that have been purchased
+    public void printSalesReport() {
+        BigDecimal total = new BigDecimal("0");
+        UserOutput.printToSalesFile("       Taste Elevator Sales Report:");
+        String top = String.format("| %-18s | %-10s | %-10s |", "Item", "Full Price", "Discounted");
+        UserOutput.printToSalesFile(top);
+        UserOutput.printToSalesFile("|--------------------|------------|------------|");
+        for (Map.Entry<Item, Integer> entry: map.entrySet()) {
+            BigDecimal fullPrice = entry.getKey().getPrice();
+            BigDecimal discountedPrice = entry.getKey().getPrice().subtract(new BigDecimal("1"));
+            total = total.add(fullPrice.multiply(new BigDecimal(entry.getKey().getRegularPurchase())));
+            total = total.add(discountedPrice.multiply(new BigDecimal(entry.getKey().getDiscountedPurchase())));
+            String str = String.format("| %-18s | %5d      | %5d      |", entry.getKey().getName(),
+                    entry.getKey().getRegularPurchase(), entry.getKey().getDiscountedPurchase());
+            UserOutput.printToSalesFile(str);
+        }
+        UserOutput.printToSalesFile("\nTotal Sales: $" + total);
     }
 
 

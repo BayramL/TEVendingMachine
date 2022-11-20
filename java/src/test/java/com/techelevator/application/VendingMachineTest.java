@@ -42,7 +42,7 @@ public class VendingMachineTest {
     }
 
     @Test
-    public void getItemFromMachine_should_subtract_correct_money_when_purchasing_one_item(){
+    public void getItemFromMachine_should_subtract_correct_money_when_purchasing_one_item() {
         vendingMachine.readInputFile("catering1.csv");
         vendingMachine.addMoney("10");
         vendingMachine.getItemFromMachine("A1", 0);
@@ -55,7 +55,7 @@ public class VendingMachineTest {
     }
 
     @Test
-    public void getItemFromMachine_should_do_nothing_when_purchasing_one_item_with_no_money(){
+    public void getItemFromMachine_should_do_nothing_when_purchasing_one_item_with_no_money() {
         vendingMachine.readInputFile("catering1.csv");
         vendingMachine.getItemFromMachine("A1", 0);
 

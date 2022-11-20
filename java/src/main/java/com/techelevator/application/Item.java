@@ -7,6 +7,24 @@ public class Item {
     private String name;
     private String type;
     private BigDecimal price;
+    private int discountedPurchase = 0;
+    private int regularPurchase = 0;
+
+    public void addToRegularPurchase() {
+        this.regularPurchase++;
+    }
+
+    public void addToDiscountedPurchase() {
+        this.discountedPurchase++;
+    }
+
+    public int getDiscountedPurchase() {
+        return discountedPurchase;
+    }
+
+    public int getRegularPurchase() {
+        return regularPurchase;
+    }
 
     public Item(String itemCode, String name, String type, BigDecimal price) {
         this.itemCode = itemCode;
